@@ -7,7 +7,7 @@ from langchain_qdrant import QdrantVectorStore
 from langchain_google_genai import ChatGoogleGenerativeAI
 from concurrent.futures import ThreadPoolExecutor
 
-GEMINI_API_KEY = "AIzaSyCz9zx5Vm97tlqkIBHMetCjqGYKqjYsCEQ"
+GEMINI_API_KEY = "your_api_key"
 
 # Load PDF document
 pdf_path = Path(__file__).parent / "resume.pdf"
