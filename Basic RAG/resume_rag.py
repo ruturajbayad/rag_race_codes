@@ -1,13 +1,11 @@
-# pip install langchain_community pypdf
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pathlib import Path
 from langchain_google_genai import GoogleGenerativeAIEmbeddings # type: ignore
 from langchain_qdrant import QdrantVectorStore
 from langchain_google_genai import ChatGoogleGenerativeAI
-import os
 
-GEMINI_API_KEY = "AIzaSyCz9zx5Vm97tlqkIBHMetCjqGYKqjYsCEQ"
+GEMINI_API_KEY = "your_api_key"
 
 # Loade PDF
 pdf_path = Path(__file__).parent / "resume.pdf"
@@ -32,15 +30,14 @@ split_docs = text_splitter.split_documents(documents=docs)
 # Embedding
 embedder = GoogleGenerativeAIEmbeddings(model='models/text-embedding-004', google_api_key=GEMINI_API_KEY)
 
-# vector_store = QdrantVectorStore.from_documents(
-#     documents=[],
-#     url="http://localhost:6333",
-#     collection_name="learning_langchain",
-#     embedding=embedder
-# )
+vector_store = QdrantVectorStore.from_documents(
+    documents=[],
+    url="http://localhost:6333",
+    collection_name="learning_langchain",
+    embedding=embedder
+)
 
-
-# vector_store.add_documents(documents=split_docs)
+vector_store.add_documents(documents=split_docs)
 
 retriever = QdrantVectorStore.from_existing_collection(
     url="http://localhost:6333",
@@ -68,15 +65,3 @@ while True:
     answer = chat_model.invoke(prompt)
 
     print(f"\n🧠 Answer:\n{answer.content}")
-
-
-
-# invoke() Function
-
-# Converts the string into a chat message format (like {role: "user", content: "Tell me a joke"})
-
-# Sends it to the LLM
-
-# Receives the response
-
-# Returns a ChatMessage object (usually AIMessage)
