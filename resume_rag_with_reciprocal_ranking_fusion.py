@@ -5,11 +5,10 @@ from pathlib import Path
 from langchain_google_genai import GoogleGenerativeAIEmbeddings  # type: ignore
 from langchain_qdrant import QdrantVectorStore
 from langchain_google_genai import ChatGoogleGenerativeAI
-import os
 from concurrent.futures import ThreadPoolExecutor
 from collections import defaultdict
 
-GEMINI_API_KEY = "AIzaSyCz9zx5Vm97tlqkIBHMetCjqGYKqjYsCEQ"
+GEMINI_API_KEY = "your_api_key"
 
 # Load PDF document
 pdf_path = Path(__file__).parent / "resume.pdf"
@@ -44,13 +43,13 @@ def reciprocal_rank_fusion(rankings, k=60):
         for rank, doc in enumerate(ranking):
             scores[doc.page_content] += 1 / (k + rank + 1)
     sorted_docs = sorted(scores.items(), key=lambda x: x[1], reverse=True)
-    return [doc for doc, _ in sorted_docs]  # return sorted page_contents
+    return [doc for doc, _ in sorted_docs]
 
 def generate_queries(user_query):
     # Use the LLM to generate sub-queries based on the user query
     prompt = f"Given the query '{user_query}', generate three different sub-queries to help retrieve more specific information related to the query. Each sub-query should focus on a different aspect of the query."
     sub_queries_response = chat_model.invoke(prompt)
-    sub_queries = sub_queries_response.content.split("\n")  # Assuming each query is on a new line
+    sub_queries = sub_queries_response.content.split("\n")
     return sub_queries
 
 def retrieve_documents(sub_query):
@@ -65,7 +64,7 @@ def process_user_query_with_rrf(user_query):
         future_to_query = {executor.submit(retrieve_documents, sub_query): sub_query for sub_query in sub_queries}
         all_ranked_lists = []
         for future in future_to_query:
-            all_ranked_lists.append(future.result())  # Each result is a ranked list
+            all_ranked_lists.append(future.result())
 
     # Apply Reciprocal Rank Fusion
     fused_results = reciprocal_rank_fusion(all_ranked_lists)
